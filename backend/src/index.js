@@ -1,5 +1,6 @@
 import express from "express";
 import authRoutes from "./routes/auth.routes.js";
+import messageRoutes from "./routes/message.routes.js";
 import cookieParser from "cookie-parser";
 import {connectDB} from "./lib/db.js"
 import dotenv from "dotenv"
@@ -17,6 +18,7 @@ app.use(express.json())
 app.use(cookieParser())
 // call the api of auth to process authentication
 app.use("/api/auth", authRoutes);
+app.use("/api/message", messageRoutes);
 
 // for testing
 app.get("/hello", (req, res) => {

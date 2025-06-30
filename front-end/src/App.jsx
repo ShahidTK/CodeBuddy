@@ -9,6 +9,7 @@ import SettingsPage from './pages/SettingsPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 
 import {Routes, Route, Navigate} from "react-router-dom";
+import { useThemeStore } from "./store/useThemeStore";
 import { useAuthStore } from './store/useAuthStore.js';
 import { Loader } from "lucide-react"
 
@@ -18,6 +19,7 @@ import { Loader } from "lucide-react"
 function App() {
   const {authUser, checkAuth, isCheckingAuth} = useAuthStore();
 
+  const { theme } = useThemeStore();
   useEffect(() => {
     checkAuth()
   }, [checkAuth]);
@@ -30,20 +32,22 @@ function App() {
     </div>
   )
 
+  // toast.success( "Logged out successfully");
+
   return (
-    <>
-      <ToastContainer position="bottom-center"  hideProgressBar="false"/>
+    <div data-theme={theme}>
+      
+      <ToastContainer position="bottom-center"  hideProgressBar="false" />
       <Navbar/>
       <Routes>
         <Route path='/' element={authUser?<HomePage/>: <Navigate to="/login" />} />
         <Route path='/signup' element={!authUser? <SignUpPage/>: <Navigate to="/" />} />
         <Route path='/login' element={!authUser? <LoginPage/>: <Navigate to="/" />} />
         <Route path='/settings' element={<SettingsPage/>} />
-        <Route path='/profile' element={authUser? <ProfilePage/>: <Navigate to="/login" />} />
+        <Route path='/profile' element={authUser? <ProfilePage/>: <ProfilePage/>} />
       </Routes>
-
       
-    </>
+      </div>
   );
 }
 

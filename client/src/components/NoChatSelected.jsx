@@ -22,7 +22,7 @@ const NoChatSelected = () => {
         <h2 className={`text-2xl font-bold ${
           theme === 'dark' ? 'text-white' : 'text-gray-800'
         }`}>
-          Welcome to ChatCode!
+          Welcome to CodeBuddy!
         </h2>
         <p className={theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}>
           Select a conversation from the sidebar to start chatting

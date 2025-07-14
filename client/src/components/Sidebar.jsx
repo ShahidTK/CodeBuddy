@@ -20,7 +20,7 @@ const Sidebar = () => {
   const onlineUserList = users.filter(user => onlineUsers.includes(user._id));
 
   return (
-    <aside className={`h-full w-20 lg:w-64 border-r flex flex-col transition-all duration-200 ${
+    <aside className={`h-full w-20 lg:w-64 border-l flex flex-col transition-all duration-200 ${
       theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
     }`}>
       <div className={`border-b w-full p-4 ${

@@ -8,7 +8,7 @@ const ChatHeader = () => {
     <div className="p-2.5 border-b border-base-300">
       <div className="flex items-center justify-between">
         {/* Group chat title */}
-        <h3 className="text-lg font-semibold">Group Chat</h3>
+        <h3 className="text-lg font-semibold">Chat Box</h3>
 
         {/* Close button */}
         <button onClick={() => setSelectedUser(null)}>

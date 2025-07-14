@@ -24,15 +24,7 @@ const CodeChat = () => {
         </div>
 
         <div className="w-[45%] flex">
-          <div className={`w-[35%] h-full flex flex-col border-r ${
-            theme === 'dark' ? 'border-gray-700 bg-gray-800' : 
-            theme === 'light' ? 'border-gray-200 bg-white' :
-            'border-gray-200 bg-white' 
-          }`}>
-            <Sidebar />
-          </div>
-
-          <div className={`w-[65%] flex flex-col relative ${
+        <div className={`w-[65%] flex flex-col relative ${
             theme === 'dark' ? 'bg-gray-900' : 
             theme === 'light' ? 'bg-white' :
             'bg-white' 
@@ -47,6 +39,15 @@ const CodeChat = () => {
               <ChatContainer />
             )}
           </div>
+          <div className={`w-[35%] h-full flex flex-col border-r ${
+            theme === 'dark' ? 'border-gray-700 bg-gray-800' : 
+            theme === 'light' ? 'border-gray-200 bg-white' :
+            'border-gray-200 bg-white' 
+          }`}>
+            <Sidebar />
+          </div>
+
+          
         </div>
       </div>
     </div>

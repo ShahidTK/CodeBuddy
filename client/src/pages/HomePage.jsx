@@ -70,7 +70,7 @@ const HomePage = () => {
           <p className={`transition-colors duration-200 ${
             theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
           }`}>
-            © {new Date().getFullYear()} CodeChat. All rights reserved.
+            © {new Date().getFullYear()} CodeBuddy  - All rights reserved.
           </p>
         </div>
       </footer>

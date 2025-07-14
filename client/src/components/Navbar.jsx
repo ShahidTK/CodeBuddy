@@ -29,7 +29,7 @@ const Navbar = () => {
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >
-              CodeChat
+              CodeBuddy
             </h1>
           </Link>
 

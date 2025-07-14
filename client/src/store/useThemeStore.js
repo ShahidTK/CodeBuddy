@@ -1,9 +1,13 @@
-import { create } from "zustand";
+// src/store/useThemeStore.js
+import { create } from 'zustand';
 
-export const useThemeStore = create((set) => ({
-  theme: localStorage.getItem("chat-theme") || "coffee",
-  setTheme: (theme) => {
-    localStorage.setItem("chat-theme", theme);
-    set({ theme });
-  },
+const useThemeStore = create((set) => ({
+  theme: 'dark',
+  setTheme: (theme) => set({ theme }),
+  toggleTheme: () => set((state) => ({
+    theme: state.theme === 'dark' ? 'light' : 'dark'
+  })),
 }));
+
+// Make sure to export as default
+export default useThemeStore;

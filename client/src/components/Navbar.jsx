@@ -9,7 +9,7 @@ const Navbar = () => {
 
   return (
     <header
-      className={`fixed w-full top-0 z-40 backdrop-blur-lg ${
+      className={`fixed w-full top-0 z-50  ${
         theme === "dark" ? "bg-gray-900/80 border-gray-800" : "bg-white/80 border-gray-200"
       } border-b`}
     >

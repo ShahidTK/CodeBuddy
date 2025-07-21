@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
 import useThemeStore from "../store/useThemeStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 // Connect to socket server
-const socket = io("http://localhost:5001");
 
 const CodeEditor = () => {
+  const {socket} = useAuthStore();
   const { theme } = useThemeStore();
   const [code, setCode] = useState("// Start coding...");
-  const [language, setLanguage] = useState("javascript");
+  const [language, setLanguage] = useState("cpp");
   const [output, setOutput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [fontSize, setFontSize] = useState(14);
+  const JudgeOApi = import.meta.env.VITE_JUDGE0_URL
+  const RapidKey = import.meta.env.VITE_RAPID_API_KEY
+  const languageId = 54;
+  const [stdin, setStdin] = useState('')
 
   const editorTheme = theme === 'light' ? 'vs' : 'vs-dark';
 
@@ -52,19 +56,30 @@ const CodeEditor = () => {
     socket.emit("languageChange", newLang);
   };
 
+
   const handleCompile = async () => {
     setIsLoading(true);
     setOutput("Running...");
     try {
-      const response = await axios.post("https://emkc.org/api/v2/piston/execute", {
-        language,
-        source: code,
-      });
+      const response = await axios.post(JudgeOApi, {
+        source_code: code,
+        languageId : languageId,
+        stdin: stdin || ''
+      }, {headers : {
+        "X-RapidAPI-Key": RapidKey,
+        "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+      }});
       setOutput(response.data.run.stdout || response.data.run.stderr || "No output");
     } catch (error) {
-      setOutput("Error: " + (error.response?.data?.message || "Compilation failed"));
+      console.log(error)
+      if(error.status===429){
+        setOutput("You’ve reached your daily compilation limit. Upgrade to Premium for unlimited access");
+      }
+      else {
+        setOutput("Compilation failed")
+      }
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 
@@ -154,7 +169,7 @@ const CodeEditor = () => {
         }`}>
           Output:
         </div>
-        <pre className={`p-2 rounded text-sm overflow-auto max-h-32 font-mono ${
+        <pre className={`p-2 rounded text-sm overflow-y-scroll max-h-48 font-mono ${
           theme === 'light' ? 'bg-white text-gray-800' : 'bg-gray-700 text-gray-200'
         }`}>
           {output || "Your output will appear here..."}

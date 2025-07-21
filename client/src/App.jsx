@@ -22,7 +22,6 @@ function App() {
   useEffect(() => {
     checkAuth()
   }, [checkAuth]);
-  console.log({authUser});
 
   // for loading icon
   if(isCheckingAuth && !authUser) return (

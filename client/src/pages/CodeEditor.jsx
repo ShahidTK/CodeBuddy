@@ -16,17 +16,17 @@ const CodeEditor = () => {
   const [fontSize, setFontSize] = useState(14);
   const JudgeOApi = import.meta.env.VITE_JUDGE0_URL
   const RapidKey = import.meta.env.VITE_RAPID_API_KEY
-  const languageId = 54;
+  const [languageId, setLanguageId] = useState(54)
   const [stdin, setStdin] = useState('')
 
   const editorTheme = theme === 'light' ? 'vs' : 'vs-dark';
 
   const languageOptions = [
-    { value: "javascript", label: "JavaScript" },
-    { value: "python", label: "Python" },
-    { value: "c", label: "C" },
-    { value: "cpp", label: "C++" },
-    { value: "java", label: "Java" },
+    { value: "javascript", label: "JavaScript", language_id: 63 },
+    { value: "python", label: "Python", language_id: 71  },
+    { value: "c", label: "C" , language_id: 50 },
+    { value: "cpp", label: "C++" , language_id: 54 },
+    { value: "java", label: "Java" , language_id: 62 },
   ];
 
   // Socket listeners
@@ -51,32 +51,69 @@ const CodeEditor = () => {
   };
 
   const handleLanguageChange = (e) => {
-    const newLang = e.target.value;
-    setLanguage(newLang);
-    socket.emit("languageChange", newLang);
+    const selectedValue = e.target.value;
+    const selectedLang = languageOptions.find(
+      (lang) => lang.value === selectedValue
+    );
+    if (selectedLang) {
+      setLanguageId(selectedLang.language_id);
+      setLanguage(selectedLang.value);
+      socket.emit("languageChange", selectedLang.value);
+    }
   };
-
 
   const handleCompile = async () => {
     setIsLoading(true);
     setOutput("Running...");
+    console.log(stdin)
     try {
-      const response = await axios.post(JudgeOApi, {
+      const submissionResponse = await axios.post(JudgeOApi, {
         source_code: code,
-        languageId : languageId,
+        language_id  : languageId,
         stdin: stdin || ''
       }, {headers : {
         "X-RapidAPI-Key": RapidKey,
         "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+         "Content-Type": "application/json",
       }});
-      setOutput(response.data.run.stdout || response.data.run.stderr || "No output");
+      const token = submissionResponse.data.token;
+
+      let statusId = 1;
+    let resultData = null;
+
+    while (statusId === 1 || statusId === 2) {
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // wait before polling
+      const resultRes = await axios.get(
+        `https://judge0-ce.p.rapidapi.com/submissions/${token}?base64_encoded=false`,
+        {
+          headers: {
+            "X-RapidAPI-Key": RapidKey,
+            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+          }
+        }
+      );
+
+      resultData = resultRes.data;
+      statusId = resultData.status?.id; // 1=In Queue, 2=Processing
+    }
+
+    if (resultData.stdout) {
+      setOutput(resultData.stdout);
+    } else if (resultData.stderr) {
+      setOutput(`Runtime Error:\n${resultData.stderr}`);
+    } else if (resultData.compile_output) {
+      setOutput(`Compilation Error:\n${resultData.compile_output}`);
+    } else {
+      setOutput("No output received.");
+    }
+
     } catch (error) {
       console.log(error)
       if(error.status===429){
         setOutput("You’ve reached your daily compilation limit. Upgrade to Premium for unlimited access");
       }
       else {
-        setOutput("Compilation failed")
+        setOutput("Compilation failed due to an unknown error.")
       }
     } finally {
         setIsLoading(false);
@@ -141,7 +178,7 @@ const CodeEditor = () => {
       </div>
 
       {/* Editor */}
-      <div className="flex-1">
+      <div className="flex-1 h-[80%] overflow-y-scroll">
         <Editor
           height="100%"
           theme={editorTheme}
@@ -159,21 +196,48 @@ const CodeEditor = () => {
           }}
         />
       </div>
-
-      {/* Output */}
-      <div className={`border-t p-3 ${
-        theme === 'light' ? 'border-gray-200 bg-gray-50' : 'border-gray-700 bg-gray-800'
-      }`}>
-        <div className={`font-medium mb-1 ${
-          theme === 'light' ? 'text-gray-800' : 'text-gray-200'
+      {/* Output  & input*/}
+      <div className=" flex flex-row gap-2 h-[20%] ">
+        {/* output section */}
+        <div className={`border-t p-3 overflow-y-scroll w-1/2 ${
+          theme === 'light' ? 'border-gray-200 bg-gray-50' : 'border-gray-700 bg-gray-800'
         }`}>
-          Output:
+          <div className={`font-medium mb-1 ${
+            theme === 'light' ? 'text-gray-800' : 'text-gray-200'
+          }`}>
+            Output:
+          </div>
+          <pre className={`p-2 rounded text-sm h-full font-mono ${
+            theme === 'light' ? 'bg-white text-gray-800' : 'bg-gray-700 text-gray-200'
+          }`}>
+            {output || "Your output will appear here..."}
+          </pre>
         </div>
-        <pre className={`p-2 rounded text-sm overflow-y-scroll max-h-48 font-mono ${
-          theme === 'light' ? 'bg-white text-gray-800' : 'bg-gray-700 text-gray-200'
+
+        {/* input section */}
+        <div className={`border-t p-3 overflow-y-scroll w-1/2 ${
+          theme === 'light' ? 'border-gray-200 bg-gray-50' : 'border-gray-700 bg-gray-800'
         }`}>
-          {output || "Your output will appear here..."}
-        </pre>
+          <div className={`font-medium mb-1 ${
+            theme === 'light' ? 'text-gray-800' : 'text-gray-200'
+          }`}>
+            Input:
+          </div>
+          <pre className={`p-2 rounded text-sm h-full font-mono ${
+            theme === 'light' ? 'bg-white text-gray-800' : 'bg-gray-700 text-gray-200'
+          }`}>
+          <textarea
+            value={stdin}  // ✅ controlled by React state
+            onChange={(e) => setStdin(e.target.value)} // ✅ update stdin
+            placeholder="Enter inputs here"
+            rows={4}
+            className={`w-full mt-1 p-2 rounded text-sm font-mono ${
+              theme === 'light'
+              ? 'bg-white text-gray-800 border border-gray-300'
+              : 'bg-gray-700 text-gray-200 border border-gray-600'
+            }`} />
+            </pre>
+        </div>
       </div>
     </div>
   );

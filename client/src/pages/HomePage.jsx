@@ -1,6 +1,5 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 import { CodeBracketIcon, ChatBubbleLeftIcon, ShareIcon } from '@heroicons/react/24/solid';
 import Navbar from "../components/Navbar";
 import useThemeStore from "../store/useThemeStore";
@@ -32,7 +31,7 @@ const HomePage = () => {
             
             <button 
               onClick={() => navigate('/CodeEditor')}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 font-medium text-lg hover:from-blue-600 hover:to-purple-700"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 font-medium text-lg hover:from-blue-600 hover:to-purple-700 cursor-pointer"
             >
               Start New Session
             </button>
